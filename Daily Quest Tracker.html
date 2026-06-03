@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Daily Quest Fitness Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #173047, #05080d 70%);
+      color: white;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .quest-box {
+      width: 100%;
+      max-width: 430px;
+      background: rgba(5, 15, 25, 0.95);
+      border: 2px solid #00d9ff;
+      box-shadow: 0 0 25px #00d9ff;
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .top-icons {
+      text-align: right;
+      color: #7ff5ff;
+      font-size: 24px;
+      letter-spacing: 10px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 30px;
+      margin: 15px 0;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px #00d9ff;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 17px;
+      line-height: 1.4;
+      margin: 25px 0;
+    }
+
+    h2 {
+      color: #4cff4c;
+      text-align: center;
+      letter-spacing: 2px;
+    }
+
+    .goal-row, .stats-box, .settings-box {
+      border: 1px solid rgba(0, 217, 255, 0.5);
+      background: rgba(0, 80, 120, 0.12);
+      margin: 12px 0;
+      padding: 15px;
+      border-radius: 4px;
+    }
+
+    .goal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .goal-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon {
+      color: #52eaff;
+      font-size: 28px;
+    }
+
+    input {
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      background: #08111c;
+      border: 1px solid #00d9ff;
+      color: white;
+      font-size: 18px;
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #00d9ff;
+      background: rgba(0, 217, 255, 0.15);
+      color: #52eaff;
+      font-size: 17px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 217, 255, 0.4);
+    }
+
+    .red-btn {
+      border-color: #ff3333;
+      color: #ff4444;
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0.4);
+    }
+
+    .gold-btn {
+      border-color: #ffd700;
+      color: #ffd700;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+      display: none;
+    }
+
+    .warning {
+      text-align: center;
+      margin: 25px 0;
+      font-size: 17px;
+      line-height: 1.4;
+    }
+
+    .warning span {
+      color: red;
+      font-weight: bold;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      text-align: center;
+    }
+
+    .stat-title {
+      color: #52eaff;
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 16px;
+      background: #08111c;
+      border: 1px solid #00d9ff;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #52eaff;
+      box-shadow: 0 0 10px #52eaff;
+      transition: width 0.3s;
+    }
+
+    .settings-box {
+      display: none;
+    }
+
+    .complete-text {
+      text-align: center;
+      color: #ffd700;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    .achievement-card {
+      border: 1px solid #ffd700;
+      background: rgba(255, 215, 0, 0.08);
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    .achievement-name {
+      color: #ffd700;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .achievement-desc {
+      color: white;
+      font-size: 14px;
+    }
+
+    .empty-achievements {
+      text-align: center;
+      color: #aaa;
+      font-style: italic;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="quest-box">
+
+  <div class="top-icons">− ×</div>
+
+  <h1>⚠ QUEST INFO</h1>
+
+  <div class="subtitle">
+    DAILY QUEST - TRAIN TO BECOME<br>
+    A FORMIDABLE COMBATANT
+  </div>
+
+  <div class="stats-box">
+    <h2>STATUS</h2>
+
+    <div class="stats-grid">
+      <div>
+        <div class="stat-title">LEVEL</div>
+        <div class="stat-value" id="level">1</div>
+      </div>
+
+      <div>
+        <div class="stat-title">TITLE</div>
+        <div class="stat-value" id="rpgTitle">Beginner</div>
+      </div>
+
+      <div>
+        <div class="stat-title">XP</div>
+        <div class="stat-value">
+          <span id="xp">0</span>/<span id="xpNeeded">100</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="stat-title">XP BAR</div>
+        <div class="progress-bar">
+          <div id="xpProgress" class="progress-fill"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="stat-title">CURRENT STREAK</div>
+        <div class="stat-value"><span id="currentStreak">0</span> DAYS</div>
+      </div>
+
+      <div>
+        <div class="stat-title">BEST STREAK</div>
+        <div class="stat-value"><span id="bestStreak">0</span> DAYS</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-box">
+    <h2>LIFETIME STATS</h2>
+
+    <div class="stats-grid">
+      <div>
+        <div class="stat-title">TOTAL PUSH-UPS</div>
+        <div class="stat-value" id="lifetimePushups">0</div>
+      </div>
+
+      <div>
+        <div class="stat-title">TOTAL SIT-UPS</div>
+        <div class="stat-value" id="lifetimeSitups">0</div>
+      </div>
+
+      <div>
+        <div class="stat-title">TOTAL SQUATS</div>
+        <div class="stat-value" id="lifetimeSquats">0</div>
+      </div>
+
+      <div>
+        <div class="stat-title">TOTAL REPS</div>
+        <div class="stat-value" id="lifetimeTotal">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-box">
+    <h2>ACHIEVEMENTS</h2>
+    <div id="achievementsList">
+      <p class="empty-achievements">No achievements unlocked yet.</p>
+    </div>
+  </div>
+
+  <button onclick="toggleSettings()">⚙ SETTINGS</button>
+
+  <div id="settingsBox" class="settings-box">
+    <h2>SETTINGS</h2>
+
+    <p>Push-up Goal</p>
+    <input type="number" id="pushupsGoalInput">
+
+    <p>Sit-up Goal</p>
+    <input type="number" id="situpsGoalInput">
+
+    <p>Squat Goal</p>
+    <input type="number" id="squatsGoalInput">
+
+    <button onclick="saveGoals()">SAVE GOALS</button>
+    <button class="red-btn" onclick="resetLevel()">RESET LEVEL & XP</button>
+  </div>
+
+  <h2>GOALS</h2>
+
+  <div class="goal-row">
+    <div class="goal-top">
+      <div class="goal-name"><span class="icon">💪</span> PUSH-UPS</div>
+      <div>[<span id="pushups">0</span>/<span id="pushupsGoal">100</span>]</div>
+    </div>
+    <input type="number" id="pushupsInput" placeholder="Enter amount">
+    <button onclick="setExercise('pushups')">CONFIRM</button>
+    <div class="progress-bar"><div id="pushupsProgress" class="progress-fill"></div></div>
+  </div>
+
+  <div class="goal-row">
+    <div class="goal-top">
+      <div class="goal-name"><span class="icon">🔥</span> SIT-UPS</div>
+      <div>[<span id="situps">0</span>/<span id="situpsGoal">100</span>]</div>
+    </div>
+    <input type="number" id="situpsInput" placeholder="Enter amount">
+    <button onclick="setExercise('situps')">CONFIRM</button>
+    <div class="progress-bar"><div id="situpsProgress" class="progress-fill"></div></div>
+  </div>
+
+  <div class="goal-row">
+    <div class="goal-top">
+      <div class="goal-name"><span class="icon">🦵</span> SQUATS</div>
+      <div>[<span id="squats">0</span>/<span id="squatsGoal">100</span>]</div>
+    </div>
+    <input type="number" id="squatsInput" placeholder="Enter amount">
+    <button onclick="setExercise('squats')">CONFIRM</button>
+    <div class="progress-bar"><div id="squatsProgress" class="progress-fill"></div></div>
+  </div>
+
+  <p id="dailyCompleteText" class="complete-text"></p>
+
+  <button id="claimRewardButton" class="gold-btn" onclick="claimDailyReward()">
+    CLAIM DAILY REWARD
+  </button>
+
+  <div class="warning">
+    <span>CAUTION!</span> - IF THE DAILY QUEST<br>
+    REMAINS INCOMPLETE, PENALTIES<br>
+    WILL BE GIVEN ACCORDINGLY.
+  </div>
+
+  <button class="red-btn" onclick="resetDay()">RESET DAY</button>
+
+</div>
+
+<script>
+let data = JSON.parse(localStorage.getItem("fitnessData")) || {
+  level: 1,
+  xp: 0,
+  pushups: 0,
+  situps: 0,
+  squats: 0,
+  pushupsGoal: 100,
+  situpsGoal: 100,
+  squatsGoal: 100,
+  currentStreak: 0,
+  bestStreak: 0,
+  lastRewardDate: "",
+  rewardClaimedToday: false,
+  lastOpenedDate: "",
+  lifetimePushups: 0,
+  lifetimeSitups: 0,
+  lifetimeSquats: 0,
+  dailyQuestsCompleted: 0,
+  unlockedAchievements: {}
+};
+
+if (!data.pushupsGoal) data.pushupsGoal = 100;
+if (!data.situpsGoal) data.situpsGoal = 100;
+if (!data.squatsGoal) data.squatsGoal = 100;
+if (data.currentStreak === undefined) data.currentStreak = 0;
+if (data.bestStreak === undefined) data.bestStreak = 0;
+if (data.lastRewardDate === undefined) data.lastRewardDate = "";
+if (data.rewardClaimedToday === undefined) data.rewardClaimedToday = false;
+if (data.lastOpenedDate === undefined) data.lastOpenedDate = "";
+if (data.lifetimePushups === undefined) data.lifetimePushups = 0;
+if (data.lifetimeSitups === undefined) data.lifetimeSitups = 0;
+if (data.lifetimeSquats === undefined) data.lifetimeSquats = 0;
+if (data.dailyQuestsCompleted === undefined) data.dailyQuestsCompleted = 0;
+if (data.unlockedAchievements === undefined) data.unlockedAchievements = {};
+
+const achievements = [
+  {
+    id: "firstQuest",
+    name: "First Quest",
+    description: "Complete your first daily quest.",
+    check: function() { return data.dailyQuestsCompleted >= 1; }
+  },
+  {
+    id: "tenQuests",
+    name: "Ten Quests",
+    description: "Complete 10 daily quests.",
+    check: function() { return data.dailyQuestsCompleted >= 10; }
+  },
+  {
+    id: "hundredQuests",
+    name: "Hundred Quests",
+    description: "Complete 100 daily quests.",
+    check: function() { return data.dailyQuestsCompleted >= 100; }
+  },
+  {
+    id: "firstSteps",
+    name: "First Steps",
+    description: "Complete 100 lifetime reps.",
+    check: function() { return getLifetimeTotal() >= 100; }
+  },
+  {
+    id: "dedicated",
+    name: "Dedicated",
+    description: "Complete 1,000 lifetime reps.",
+    check: function() { return getLifetimeTotal() >= 1000; }
+  },
+  {
+    id: "warrior",
+    name: "Warrior",
+    description: "Complete 5,000 lifetime reps.",
+    check: function() { return getLifetimeTotal() >= 5000; }
+  },
+  {
+    id: "monster",
+    name: "Monster",
+    description: "Complete 10,000 lifetime reps.",
+    check: function() { return getLifetimeTotal() >= 10000; }
+  },
+  {
+    id: "traineeLevel",
+    name: "Trainee",
+    description: "Reach Level 5.",
+    check: function() { return data.level >= 5; }
+  },
+  {
+    id: "athleteLevel",
+    name: "Athlete",
+    description: "Reach Level 10.",
+    check: function() { return data.level >= 10; }
+  },
+  {
+    id: "lockedInLevel",
+    name: "Locked In",
+    description: "Reach Level 25.",
+    check: function() { return data.level >= 25; }
+  },
+  {
+    id: "beastLevel",
+    name: "Beast",
+    description: "Reach Level 50.",
+    check: function() { return data.level >= 50; }
+  },
+  {
+    id: "consistent",
+    name: "Consistent",
+    description: "Reach a 3 day streak.",
+    check: function() { return data.currentStreak >= 3; }
+  },
+  {
+    id: "disciplined",
+    name: "Disciplined",
+    description: "Reach a 7 day streak.",
+    check: function() { return data.currentStreak >= 7; }
+  },
+  {
+    id: "unstoppable",
+    name: "Unstoppable",
+    description: "Reach a 30 day streak.",
+    check: function() { return data.currentStreak >= 30; }
+  }
+];
+
+function getTodayDate() {
+  return new Date().toDateString();
+}
+
+function getYesterdayDate() {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return yesterday.toDateString();
+}
+
+function xpNeeded() {
+  return data.level * 100;
+}
+
+function getLifetimeTotal() {
+  return data.lifetimePushups + data.lifetimeSitups + data.lifetimeSquats;
+}
+
+function getRpgTitle() {
+  if (data.level >= 50) return "Beast";
+  if (data.level >= 25) return "Locked In";
+  if (data.level >= 10) return "Athlete";
+  if (data.level >= 5) return "Trainee";
+  return "Beginner";
+}
+
+function saveData() {
+  localStorage.setItem("fitnessData", JSON.stringify(data));
+}
+
+function addXP(amount) {
+  data.xp += amount;
+
+  while (data.xp >= xpNeeded()) {
+    data.xp -= xpNeeded();
+    data.level++;
+    alert("LEVEL UP! You are now Level " + data.level + " - " + getRpgTitle());
+  }
+
+  checkAchievements();
+}
+
+function goalComplete() {
+  return (
+    data.pushups >= data.pushupsGoal &&
+    data.situps >= data.situpsGoal &&
+    data.squats >= data.squatsGoal
+  );
+}
+
+function updateProgressBar(id, current, goal) {
+  let percent = 0;
+
+  if (goal > 0) {
+    percent = Math.min((current / goal) * 100, 100);
+  }
+
+  document.getElementById(id).style.width = percent + "%";
+}
+
+function checkAchievements() {
+  let newlyUnlocked = [];
+
+  achievements.forEach(function(achievement) {
+    if (!data.unlockedAchievements[achievement.id] && achievement.check()) {
+      data.unlockedAchievements[achievement.id] = true;
+      newlyUnlocked.push(achievement);
+    }
+  });
+
+  if (newlyUnlocked.length > 0) {
+    saveData();
+    updateAchievementsDisplay();
+
+    newlyUnlocked.forEach(function(achievement) {
+      alert(
+        "🏆 ACHIEVEMENT UNLOCKED!\n\n" +
+        achievement.name + "\n" +
+        achievement.description
+      );
+    });
+  }
+}
+
+function updateAchievementsDisplay() {
+  const list = document.getElementById("achievementsList");
+  list.innerHTML = "";
+
+  const unlocked = achievements.filter(function(achievement) {
+    return data.unlockedAchievements[achievement.id];
+  });
+
+  if (unlocked.length === 0) {
+    list.innerHTML = '<p class="empty-achievements">No achievements unlocked yet.</p>';
+    return;
+  }
+
+  unlocked.forEach(function(achievement) {
+    const card = document.createElement("div");
+    card.className = "achievement-card";
+
+    card.innerHTML =
+      '<div class="achievement-name">🏆 ' + achievement.name + '</div>' +
+      '<div class="achievement-desc">' + achievement.description + '</div>';
+
+    list.appendChild(card);
+  });
+}
+
+function updateScreen() {
+  document.getElementById("level").textContent = data.level;
+  document.getElementById("rpgTitle").textContent = getRpgTitle();
+  document.getElementById("xp").textContent = data.xp;
+  document.getElementById("xpNeeded").textContent = xpNeeded();
+
+  document.getElementById("pushups").textContent = data.pushups;
+  document.getElementById("situps").textContent = data.situps;
+  document.getElementById("squats").textContent = data.squats;
+
+  document.getElementById("pushupsGoal").textContent = data.pushupsGoal;
+  document.getElementById("situpsGoal").textContent = data.situpsGoal;
+  document.getElementById("squatsGoal").textContent = data.squatsGoal;
+
+  document.getElementById("pushupsGoalInput").value = data.pushupsGoal;
+  document.getElementById("situpsGoalInput").value = data.situpsGoal;
+  document.getElementById("squatsGoalInput").value = data.squatsGoal;
+
+  document.getElementById("currentStreak").textContent = data.currentStreak;
+  document.getElementById("bestStreak").textContent = data.bestStreak;
+
+  document.getElementById("lifetimePushups").textContent = data.lifetimePushups;
+  document.getElementById("lifetimeSitups").textContent = data.lifetimeSitups;
+  document.getElementById("lifetimeSquats").textContent = data.lifetimeSquats;
+  document.getElementById("lifetimeTotal").textContent = getLifetimeTotal();
+
+  updateProgressBar("xpProgress", data.xp, xpNeeded());
+  updateProgressBar("pushupsProgress", data.pushups, data.pushupsGoal);
+  updateProgressBar("situpsProgress", data.situps, data.situpsGoal);
+  updateProgressBar("squatsProgress", data.squats, data.squatsGoal);
+
+  updateAchievementsDisplay();
+
+  const claimButton = document.getElementById("claimRewardButton");
+  const completeText = document.getElementById("dailyCompleteText");
+
+  if (goalComplete() && !data.rewardClaimedToday) {
+    claimButton.style.display = "block";
+    completeText.textContent = "DAILY QUEST COMPLETE!";
+  } else if (data.rewardClaimedToday) {
+    claimButton.style.display = "none";
+    completeText.textContent = "DAILY REWARD CLAIMED!";
+  } else {
+    claimButton.style.display = "none";
+    completeText.textContent = "";
+  }
+}
+
+function setExercise(type) {
+  const input = document.getElementById(type + "Input");
+  const newAmount = Number(input.value);
+
+  if (input.value === "" || newAmount < 0) {
+    alert("Please enter a valid number.");
+    return;
+  }
+
+  const oldAmount = data[type];
+  data[type] = newAmount;
+
+  const repsAdded = Math.max(0, newAmount - oldAmount);
+  const xpGained = Math.floor(repsAdded / 10);
+
+  if (repsAdded > 0) {
+    if (type === "pushups") {
+      data.lifetimePushups += repsAdded;
+    }
+
+    if (type === "situps") {
+      data.lifetimeSitups += repsAdded;
+    }
+
+    if (type === "squats") {
+      data.lifetimeSquats += repsAdded;
+    }
+  }
+
+  addXP(xpGained);
+
+  input.value = "";
+
+  checkAchievements();
+  saveData();
+  updateScreen();
+}
+
+function claimDailyReward() {
+  if (!goalComplete()) {
+    alert("Complete all daily goals first.");
+    return;
+  }
+
+  if (data.rewardClaimedToday) {
+    alert("You have already claimed today's reward.");
+    return;
+  }
+
+  const today = getTodayDate();
+  const yesterday = getYesterdayDate();
+
+  if (data.lastRewardDate === yesterday) {
+    data.currentStreak++;
+  } else if (data.lastRewardDate !== today) {
+    data.currentStreak = 1;
+  }
+
+  if (data.currentStreak > data.bestStreak) {
+    data.bestStreak = data.currentStreak;
+  }
+
+  data.lastRewardDate = today;
+  data.rewardClaimedToday = true;
+  data.dailyQuestsCompleted++;
+
+  addXP(50);
+
+  checkAchievements();
+  saveData();
+  updateScreen();
+
+  alert("DAILY REWARD CLAIMED! +50 XP");
+}
+
+function resetDay() {
+  const sure = confirm("Are you sure you want to reset today's exercise progress?");
+
+  if (!sure) return;
+
+  data.pushups = 0;
+  data.situps = 0;
+  data.squats = 0;
+  data.rewardClaimedToday = false;
+
+  saveData();
+  updateScreen();
+}
+
+function toggleSettings() {
+  const box = document.getElementById("settingsBox");
+
+  if (box.style.display === "block") {
+    box.style.display = "none";
+  } else {
+    box.style.display = "block";
+  }
+}
+
+function saveGoals() {
+  const pushGoal = Number(document.getElementById("pushupsGoalInput").value);
+  const sitGoal = Number(document.getElementById("situpsGoalInput").value);
+  const squatGoal = Number(document.getElementById("squatsGoalInput").value);
+
+  if (pushGoal <= 0 || sitGoal <= 0 || squatGoal <= 0) {
+    alert("Goals must be higher than 0.");
+    return;
+  }
+
+  data.pushupsGoal = pushGoal;
+  data.situpsGoal = sitGoal;
+  data.squatsGoal = squatGoal;
+
+  saveData();
+  updateScreen();
+
+  alert("Goals saved!");
+}
+
+function resetLevel() {
+  const sure = confirm(
+    "Are you sure you want to reset your Level and XP? This cannot be undone."
+  );
+
+  if (sure) {
+    data.level = 1;
+    data.xp = 0;
+
+    saveData();
+    updateScreen();
+
+    alert("Level and XP have been reset.");
+  }
+}
+
+function checkNewDay() {
+  const today = getTodayDate();
+
+  if (data.lastOpenedDate !== today) {
+    data.rewardClaimedToday = false;
+    data.lastOpenedDate = today;
+    saveData();
+  }
+}
+
+checkNewDay();
+checkAchievements();
+updateScreen();
+</script>
+
+</body>
+</html>
